@@ -17,6 +17,8 @@ import (
 	"github.com/golang/lint"
 )
 
+const Magic = "EX" // thanks microsoft
+
 var (
 	omit       = flag.Bool("o", false, "add omitempty flag to json tag")
 	typ        = flag.String("t", "X", "the root element's type name")
@@ -25,27 +27,29 @@ var (
 	level      int
 	pass       int
 	b          = new(bytes.Buffer)
-	rules      []*edit.Command
+	rules      map[string]*edit.Command
 	pred       string
 )
 
 func Name(s string) string {
-	b := []byte(s)
+	s += Magic
 	if rules != nil {
-		for _, v := range rules {
-			b = transform(v, b)
+		if r, ok := rules[s]; ok {
+			s = string(transform(r, []byte(s)))
 		}
-		s = string(b)
 
 	}
+
 	if pass > 0 && len(s) > 0 {
+		b := []byte(s)
 		b[0] = b[0] &^ 0x20
-		s = string(b)
+		s = string(b[:len(b)-len(Magic)])
 		if strings.HasPrefix(s, pred) && len(s) != len(pred) {
 			// Ble, ble, bleh, bleh, ble, that's all folks!
 			s = s[len(pred):]
 		}
 	}
+
 	Printf(s)
 	return s
 }
@@ -87,6 +91,9 @@ func unite2(a []interface{}) []interface{} {
 	return a
 }
 func unite(j interface{}) {
+	if j == nil {
+		return
+	}
 	v := reflect.ValueOf(j).Interface()
 	switch reflect.TypeOf(j).Kind() {
 	case reflect.Map:
@@ -99,6 +106,10 @@ func unite(j interface{}) {
 }
 
 func parse(j interface{}) {
+	if j == nil {
+		Printf(" interface{}")
+		return
+	}
 	v := reflect.ValueOf(j).Interface()
 	switch reflect.TypeOf(j).Kind() {
 	case reflect.Ptr:
@@ -127,6 +138,8 @@ func parse(j interface{}) {
 		fmt.Fprint(b, " string")
 	case reflect.Bool:
 		fmt.Fprint(b, " bool")
+	default:
+		fmt.Fprint(b, " interface{}")
 	}
 
 }
@@ -143,6 +156,8 @@ func main() {
 
 	var mp interface{}
 	err = json.Unmarshal(data, &mp)
+	ck("json", err)
+
 	Unite(mp)
 	Parse(mp)
 	// if golint complains about names, change them to the suggested name
@@ -151,8 +166,12 @@ func main() {
 	}
 	linter := &lint.Linter{}
 	prob, err := linter.LintFiles(files)
-	ck("lint", err)
+	if err != nil {
+		log.Printf("ERROR DUMP: %s\n", b.Bytes())
+		ck("lint", err)
+	}
 
+	rules = make(map[string]*edit.Command)
 	for _, v := range prob {
 		if v.Category != "naming" {
 			continue
@@ -160,7 +179,8 @@ func main() {
 		if err != nil {
 			log.Fatalln(err)
 		}
-		rules = append(rules, edit.MustCompile(mkX([]byte(v.Text))))
+		src, prog := mkX([]byte(v.Text))
+		rules[src] = edit.MustCompile(prog)
 		ck("rules", err)
 	}
 
@@ -189,7 +209,7 @@ func transform(c *edit.Command, s []byte) []byte {
 
 // mkX creates an edit program from the result of a go-lint name suggestion. the output is
 // compiled to an edit program and executed on the source code
-func mkX(data []byte) string {
+func mkX(data []byte) (string, string) {
 	buf := text.BufferFrom(data)
 	ed, _ := text.Open(buf)
 	cc := edit.MustCompile
@@ -200,7 +220,7 @@ func mkX(data []byte) string {
 	if len(xy) < 2 {
 		panic("cant find replacement expression for  name")
 	}
-	return fmt.Sprintf(",x,%s,c,%s,", xy[0], xy[1])
+	return xy[0], fmt.Sprintf(",x,%s,c,%s,", xy[0], xy[1])
 }
 
 func init() {
@@ -212,18 +232,7 @@ NAME
 SYNOPSIS
 	sanctify < data.json
 
-DESCRIPTION
-	Sanctify reads stdin and converts JSON to an idiomatic Go struct.
-	It applies the following rules:
-	
-	1.) Marshal JSON into a Go struct
-	2.) Remove underscores in variable names
-	3.) Capitalize letter occupying position of deleted underscores
-	4.) Run golint to enumerate improperly-punctuated acronyms
-	5.) Run gofmt -s to simplify code
-	6.) Remove stuttercase naming from nested structures (see example)
-	
-	There are a few options:
+OPTIONS
 	
 	-p    Package name to generate (default: main)
 	-t    JSON root element type (default: X)
