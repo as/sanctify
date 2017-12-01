@@ -64,6 +64,40 @@ func addtag(s string) string {
 	return fmt.Sprintf("`json:\"%s%s\"`\n", s, omitstring)
 }
 
+func Unite(j interface{}) {
+	unite(j)
+}
+func unite2(a []interface{}) []interface{} {
+	if len(a) == 0 {
+		return a
+	}
+	m3 := make(map[string]interface{})
+	for _, v := range a {
+		if v == nil {
+			continue
+		}
+		switch reflect.TypeOf(v).Kind() {
+		case reflect.Map:
+			for k, v := range reflect.ValueOf(v).Interface().(map[string]interface{}) {
+				m3[k] = v
+			}
+		}
+	}
+	a[0] = m3
+	return a
+}
+func unite(j interface{}) {
+	v := reflect.ValueOf(j).Interface()
+	switch reflect.TypeOf(j).Kind() {
+	case reflect.Map:
+		for _, v := range v.(map[string]interface{}) {
+			defer unite(v)
+		}
+	case reflect.Slice:
+		defer unite2(v.([]interface{}))
+	}
+}
+
 func parse(j interface{}) {
 	v := reflect.ValueOf(j).Interface()
 	switch reflect.TypeOf(j).Kind() {
@@ -109,6 +143,7 @@ func main() {
 
 	var mp interface{}
 	err = json.Unmarshal(data, &mp)
+	Unite(mp)
 	Parse(mp)
 	// if golint complains about names, change them to the suggested name
 	files := map[string][]byte{
