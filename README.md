@@ -1,6 +1,6 @@
 ## Sanctify
 
-Convert JSON to an idiomatic go struct
+Convert JSON data into a Go struct with idiomatic field names
   
 ## Synopsis
 
@@ -10,8 +10,12 @@ Convert JSON to an idiomatic go struct
   
 ## Description
 
-Sanctify reads stdin and converts JSON to an idiomatic Go struct.
-It applies the following rules:
+Much of the work in creating a marshaller is in the tweaks that occur after the specification is
+copied into Go source code. Because Go allows structs to have tags, you can keep the bad names in
+an already-established API specification out of the struct field names. This package is an executable
+that reads JSON data and converts it into Go, but also takes the labor and guess work out of such decisions. 
+
+It uses the following process:
 	
 - Marshal JSON into a Go interface{}
 - Recursively descend into arrays, amalagating fields of underlying JSON objects into a set
@@ -23,14 +27,25 @@ It applies the following rules:
 - Reparse the amalagate, applying corrections during the recursive descent step
 - Prefix compare child fields to parent fields, remove stuttercase naming in Go field names
 - Run gofmt -s to simplify code
-	
+
+Then you:
+
+- Check the auto-generated code for consistency
+- Paste it into your project
+
 ## Options
 	
 	-p    Package name to generate (default: main)
 	-t    JSON root element type (default: X)
 	-o    Add omitempty to all fields
   
- ## Example
+
+## Why
+
+- Generates Go without adding third party dependencies.
+- Save time correcting huge datasets by hand
+
+## Example
  
 `echo {"msg":{"msg_string":"hi","msg_num": 3}} | sanctify`
    
@@ -93,3 +108,5 @@ type X struct {
         } `json:"menu"`
 }
 ```
+
+
