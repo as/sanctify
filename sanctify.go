@@ -85,6 +85,7 @@ func parse(j interface{}) {
 		fmt.Fprint(b, " []")
 		for _, v := range v.([]interface{}) {
 			parse(v)
+			break // we don't need to parse them all, it's an array
 		}
 	case reflect.Int, reflect.Float64:
 		fmt.Fprint(b, " int")
