@@ -4,6 +4,8 @@ Convert JSON to an idiomatic go struct
   
 ## Synopsis
 
+`go get -u github.com/as/sanctify/...`
+
 `sanctify < data.json`
   
 ## Description
