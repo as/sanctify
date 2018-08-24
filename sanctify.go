@@ -185,7 +185,6 @@ func main() {
 	}
 
 	rules = make(map[string]*edit.Command)
-	rules["nodashes"] = edit.MustCompile(`,x,-,d`)
 	for _, v := range prob {
 		if v.Category != "naming" {
 			continue
@@ -193,6 +192,7 @@ func main() {
 		if err != nil {
 			log.Fatalln(err)
 		}
+		rules["nodashes"] = edit.MustCompile(`,x,-,d`)
 		src, prog := mkX([]byte(v.Text))
 		rules[src] = edit.MustCompile(prog)
 		ck("rules", err)
