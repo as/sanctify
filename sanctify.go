@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"reflect"
+	"sort"
 	"strings"
 
 	"github.com/as/edit"
@@ -114,6 +115,57 @@ func unite(j interface{}) {
 	}
 }
 
+type bySuffix []string
+func (b bySuffix) Suffix(i int) (string){
+	s := b[i]
+	if len(s) == 0 || len(s) == 1{
+		return s
+	}
+	t := strings.LastIndexAny(s[:len(s)-1], "-_")
+	u := strings.LastIndexAny(s[:len(s)-1], "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	if t >= u {
+		if t <= 0{
+			return s
+		}
+		return s[t+1:]
+	}
+	return s[u:]
+}
+
+func (b bySuffix) Swap(i,j int) {
+	b[i], b[j] = b[j], b[i]
+}
+func (b bySuffix) Less(i,j int) bool{
+	if v := strings.Compare(b.Suffix(i), b.Suffix(j)); v != 0{
+		return v == -1
+	}
+	return strings.Compare(b[i], b[j]) == -1
+}
+func (b bySuffix) Len() int{ return len(b)}
+	
+func arrange(m map[string]interface{}) (om map[string]interface{}, keys []string) {
+	m2 := make(map[string]interface{}, len(m))
+	for k, v := range m {
+		m2[k] = v
+	}
+
+	common := []string{"id", "name", "label", "tags"}
+	for _, v := range common {
+		if _, ok := m[v]; ok {
+			delete(m2, v)
+			keys = append(keys, v)
+		}
+	}
+
+	exist := []string{}
+	for k, _ := range m2 {
+		exist = append(exist, k)
+	}
+
+	sort.Sort(bySuffix(exist))
+	return m, append(keys, exist...)
+}
+
 func parse(j interface{}) {
 	if j == nil {
 		Printf(" interface{}")
@@ -126,7 +178,9 @@ func parse(j interface{}) {
 	case reflect.Map:
 		Printf(" struct{\n")
 		level++
-		for k, v := range v.(map[string]interface{}) {
+		m, keys := arrange(v.(map[string]interface{}))
+		for _, k := range keys {
+			v := m[k]
 			last := pred
 			pred = Name(k)
 			parse(v)
