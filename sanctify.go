@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"encoding/json" 
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -31,14 +31,14 @@ var (
 	pred       string
 )
 
-func nodash(s string) string{
+func nodash(s string) string {
 	b := []byte(s)
-		if n := bytes.Index(b, []byte{'-'}); n != -1{
-			if copy(b[n:], b[n+1:]) > 0{
-				b[n] = b[n] &^ 0x20
-			}
-			s = string(b[:len(b)-1])
+	if n := bytes.Index(b, []byte{'-'}); n != -1 {
+		if copy(b[n:], b[n+1:]) > 0 {
+			b[n] = b[n] &^ 0x20
 		}
+		s = string(b[:len(b)-1])
+	}
 	return s
 }
 
@@ -59,7 +59,7 @@ func Name(s string) string {
 			s = s[len(pred):]
 		}
 	}
-	Printf("%s",nodash(s))
+	Printf("%s", nodash(s))
 	return s
 }
 func Printf(fm string, i ...interface{}) {
