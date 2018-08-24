@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math"
 	"os"
 	"os/exec"
 	"reflect"
@@ -159,7 +160,7 @@ func arrange(m map[string]interface{}) (om map[string]interface{}, keys []string
 	}
 
 	exist := []string{}
-	for k := range m2 {
+	for k, _ := range m2 {
 		exist = append(exist, k)
 	}
 
@@ -201,7 +202,14 @@ func parse(j interface{}) {
 		if i == 0 {
 			fmt.Fprint(b, "interface{}")
 		}
-	case reflect.Int, reflect.Float64:
+	case reflect.Float64:
+		_, f := math.Modf(v.(float64))
+		if f == 0 {
+			fmt.Fprint(b, " int")
+		} else {
+			fmt.Fprint(b, " float64")
+		}
+	case reflect.Int:
 		fmt.Fprint(b, " int")
 	case reflect.String:
 		fmt.Fprint(b, " string")
