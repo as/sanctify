@@ -137,9 +137,13 @@ func parse(j interface{}) {
 		Printf(" }")
 	case reflect.Slice:
 		fmt.Fprint(b, " []")
+		i := 0
 		for _, v := range v.([]interface{}) {
 			parse(v)
 			break // we don't need to parse them all, it's an array
+		}
+		if i == 0 {
+			fmt.Fprint(b, "interface{}")
 		}
 	case reflect.Int, reflect.Float64:
 		fmt.Fprint(b, " int")
@@ -181,6 +185,7 @@ func main() {
 	}
 
 	rules = make(map[string]*edit.Command)
+	rules["nodashes"] = edit.MustCompile(`,x,-,d`)
 	for _, v := range prob {
 		if v.Category != "naming" {
 			continue
