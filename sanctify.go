@@ -160,7 +160,7 @@ func arrange(m map[string]interface{}) (om map[string]interface{}, keys []string
 	}
 
 	exist := []string{}
-	for k, _ := range m2 {
+	for k := range m2 {
 		exist = append(exist, k)
 	}
 
