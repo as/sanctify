@@ -140,6 +140,7 @@ func parse(j interface{}) {
 		i := 0
 		for _, v := range v.([]interface{}) {
 			parse(v)
+			i++
 			break // we don't need to parse them all, it's an array
 		}
 		if i == 0 {
