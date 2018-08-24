@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
+	"encoding/json" 
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -31,14 +31,14 @@ var (
 	pred       string
 )
 
-func nodash(s string) string {
+func nodash(s string) string{
 	b := []byte(s)
-	if n := bytes.Index(b, []byte{'-'}); n != -1 {
-		if copy(b[n:], b[n+1:]) > 0 {
-			b[n] = b[n] &^ 0x20
+		if n := bytes.Index(b, []byte{'-'}); n != -1{
+			if copy(b[n:], b[n+1:]) > 0{
+				b[n] = b[n] &^ 0x20
+			}
+			s = string(b[:len(b)-1])
 		}
-		s = string(b[:len(b)-1])
-	}
 	return s
 }
 
@@ -59,7 +59,7 @@ func Name(s string) string {
 			s = s[len(pred):]
 		}
 	}
-	Printf("%s", nodash(s))
+	Printf("%s",nodash(s))
 	return s
 }
 func Printf(fm string, i ...interface{}) {
@@ -142,7 +142,7 @@ func parse(j interface{}) {
 			parse(v)
 			break // we don't need to parse them all, it's an array
 		}
-		if i == 0 {
+		if i == 0{
 			fmt.Fprint(b, "interface{}")
 		}
 	case reflect.Int, reflect.Float64:
@@ -192,7 +192,6 @@ func main() {
 		if err != nil {
 			log.Fatalln(err)
 		}
-		rules["nodashes"] = edit.MustCompile(`,x,-,d`)
 		src, prog := mkX([]byte(v.Text))
 		rules[src] = edit.MustCompile(prog)
 		ck("rules", err)
