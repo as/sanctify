@@ -116,15 +116,16 @@ func unite(j interface{}) {
 }
 
 type bySuffix []string
-func (b bySuffix) Suffix(i int) (string){
+
+func (b bySuffix) Suffix(i int) string {
 	s := b[i]
-	if len(s) == 0 || len(s) == 1{
+	if len(s) == 0 || len(s) == 1 {
 		return s
 	}
 	t := strings.LastIndexAny(s[:len(s)-1], "-_")
 	u := strings.LastIndexAny(s[:len(s)-1], "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	if t >= u {
-		if t <= 0{
+		if t <= 0 {
 			return s
 		}
 		return s[t+1:]
@@ -132,17 +133,17 @@ func (b bySuffix) Suffix(i int) (string){
 	return s[u:]
 }
 
-func (b bySuffix) Swap(i,j int) {
+func (b bySuffix) Swap(i, j int) {
 	b[i], b[j] = b[j], b[i]
 }
-func (b bySuffix) Less(i,j int) bool{
-	if v := strings.Compare(b.Suffix(i), b.Suffix(j)); v != 0{
+func (b bySuffix) Less(i, j int) bool {
+	if v := strings.Compare(b.Suffix(i), b.Suffix(j)); v != 0 {
 		return v == -1
 	}
 	return strings.Compare(b[i], b[j]) == -1
 }
-func (b bySuffix) Len() int{ return len(b)}
-	
+func (b bySuffix) Len() int { return len(b) }
+
 func arrange(m map[string]interface{}) (om map[string]interface{}, keys []string) {
 	m2 := make(map[string]interface{}, len(m))
 	for k, v := range m {
@@ -158,7 +159,7 @@ func arrange(m map[string]interface{}) (om map[string]interface{}, keys []string
 	}
 
 	exist := []string{}
-	for k, _ := range m2 {
+	for k := range m2 {
 		exist = append(exist, k)
 	}
 
