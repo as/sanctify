@@ -16,7 +16,7 @@ import (
 
 	"github.com/as/edit"
 	"github.com/as/text"
-	"github.com/golang/lint"
+	"golang.org/x/lint"
 )
 
 const Magic = "EX" // thanks microsoft
