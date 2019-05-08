@@ -1,0 +1,17 @@
+# github.com/as/edit v0.6.14
+github.com/as/edit
+# github.com/as/event v0.6.8
+github.com/as/event
+# github.com/as/io v0.1.0
+github.com/as/io/rev
+# github.com/as/text v0.7.0
+github.com/as/text
+github.com/as/text/find
+# github.com/as/worm v0.6.7
+github.com/as/worm
+# golang.org/x/lint v0.0.0-20190409202823-959b441ac422
+golang.org/x/lint
+# golang.org/x/tools v0.0.0-20190311212946-11955173bddd
+golang.org/x/tools/go/ast/astutil
+golang.org/x/tools/go/gcexportdata
+golang.org/x/tools/go/internal/gcimporter
