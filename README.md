@@ -111,7 +111,10 @@ type X struct {
 
 # Example 3
 
-```hget https://api.github.com/repos/as/sanctify | sanctify```
+```
+curl https://api.github.com/repos/as/sanctify | sanctify
+hget https://api.github.com/repos/as/sanctify | sanctify
+```
 
 ```
 type X struct {
