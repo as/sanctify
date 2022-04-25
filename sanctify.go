@@ -16,15 +16,16 @@ import (
 
 	"github.com/as/edit"
 	"github.com/as/text"
-	"github.com/golang/lint"
+	"golang.org/x/lint"
 )
 
 const Magic = "EX" // thanks microsoft
 
 var (
-	omit       = flag.Bool("o", false, "add omitempty flag to json tag")
-	typ        = flag.String("t", "X", "the root element's type name")
-	pkg        = flag.String("p", "main", "the name of the package")
+	omit = flag.Bool("o", false, "add omitempty flag to json tag")
+	typ  = flag.String("t", "X", "the root element's type name")
+	pkg  = flag.String("p", "main", "the name of the package")
+
 	omitstring = ""
 	level      int
 	pass       int
@@ -33,9 +34,11 @@ var (
 	pred       string
 )
 
+const forbidden = `!@#$%^*()-=+`
+
 func nodash(s string) string {
 	b := []byte(s)
-	if n := bytes.Index(b, []byte{'-'}); n != -1 {
+	if n := bytes.IndexAny(b, forbidden); n != -1 {
 		if copy(b[n:], b[n+1:]) > 0 {
 			b[n] = b[n] &^ 0x20
 		}
@@ -64,12 +67,14 @@ func Name(s string) string {
 	Printf("%s", nodash(s))
 	return s
 }
+
 func Printf(fm string, i ...interface{}) {
 	for i := 0; i < level; i++ {
 		fmt.Fprintf(b, "\t")
 	}
 	fmt.Fprintf(b, fm, i...)
 }
+
 func Parse(j interface{}) {
 	fmt.Fprintf(b, "package %s\ntype %s ", *pkg, *typ)
 	parse(j)
