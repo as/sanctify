@@ -34,7 +34,7 @@ var (
 	pred       string
 )
 
-const forbidden = `!@#$%^*()-=+`
+const forbidden = `!@#$%^*()-=+{}/.`
 
 func nodash(s string) string {
 	b := []byte(s)
